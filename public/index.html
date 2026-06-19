@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conway's Game of Life — Cellular Automaton Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div id="cursor-dot"></div>
+
+  <nav class="nav">
+    <div class="nav-brand">
+      <span class="brand-mark"></span>
+      <span class="brand-text">CELLULAR/LAB</span>
+    </div>
+    <div class="nav-links">
+      <a href="#simulator">SIMULATOR</a>
+      <a href="#rules">RULES</a>
+      <a href="#patterns">TAXONOMY</a>
+      <a href="#about">PROVENANCE</a>
+    </div>
+    <div class="nav-meta">
+      <span class="status-dot"></span>
+      <span>v0.1.0</span>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-meta">
+      <span>CONWAY · 1970</span>
+      <span>TURING-COMPLETE · 2D · 2-STATE</span>
+    </div>
+    <h1 id="hero-title" class="hero-title">CONWAY'S GAME OF LIFE</h1>
+    <p class="hero-sub headline-enter">
+      A zero-player game. Four rules. Infinite emergence. Devised by John Horton Conway in 1970 on a Go board in his Cambridge common room — played on an unbounded orthogonal grid where every cell lives or dies by its eight neighbors.
+    </p>
+    <div class="hero-cue headline-enter">
+      <span>SCROLL TO SIMULATE</span>
+      <span class="cue-arrow">↓</span>
+    </div>
+  </section>
+
+  <section id="simulator" class="simulator">
+    <header class="section-head">
+      <span class="label">01 / SIMULATOR</span>
+      <h2 class="headline-enter">A grid of 12,600 cells.<br>Twelve thousand six hundred verdicts per frame.</h2>
+    </header>
+
+    <div class="sim-shell">
+      <aside class="sim-controls">
+        <div class="ctrl-group">
+          <span class="ctrl-label">PLAYBACK</span>
+          <div class="ctrl-row">
+            <button id="btn-play" class="ctrl-btn primary">PLAY</button>
+            <button id="btn-step" class="ctrl-btn">STEP</button>
+          </div>
+          <div class="ctrl-row">
+            <button id="btn-clear" class="ctrl-btn">CLEAR</button>
+            <button id="btn-random" class="ctrl-btn">RANDOM</button>
+          </div>
+        </div>
+
+        <div class="ctrl-group">
+          <span class="ctrl-label">SPEED · <span id="speed-val">10</span> GPS</span>
+          <input id="speed" type="range" min="1" max="60" value="10" class="ctrl-range">
+        </div>
+
+        <div class="ctrl-group">
+          <span class="ctrl-label">CELL SIZE · <span id="zoom-val">7</span>PX</span>
+          <input id="zoom" type="range" min="3" max="14" value="7" class="ctrl-range">
+        </div>
+
+        <div class="ctrl-group">
+          <span class="ctrl-label">DRAW MODE</span>
+          <div class="ctrl-row">
+            <button id="mode-toggle" class="ctrl-btn primary">PAINT</button>
+            <button id="mode-stamp" class="ctrl-btn">STAMP</button>
+          </div>
+          <p class="ctrl-hint">Click and drag to paint cells.<br>SPACE play · S step · C clear · R random</p>
+        </div>
+      </aside>
+
+      <div class="sim-canvas-wrap">
+        <canvas id="grid" class="sim-canvas"></canvas>
+        <div class="canvas-overlay">
+          <div class="overlay-axis"><span>X</span><span id="cursor-x">000</span></div>
+          <div class="overlay-axis"><span>Y</span><span id="cursor-y">000</span></div>
+          <div class="overlay-axis"><span>GPS</span><span id="fps">0</span></div>
+        </div>
+      </div>
+
+      <aside class="sim-stats">
+        <div class="stat-row">
+          <span class="stat-label">STATUS</span>
+          <span class="stat-val" id="stat-status">IDLE</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">GENERATION</span>
+          <span class="stat-val" id="stat-gen">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">POPULATION</span>
+          <span class="stat-val" id="stat-pop">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">DENSITY</span>
+          <span class="stat-val" id="stat-density">0.00%</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">BORN · THIS GEN</span>
+          <span class="stat-val" id="stat-born">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">DIED · THIS GEN</span>
+          <span class="stat-val" id="stat-died">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">STABILITY</span>
+          <span class="stat-val" id="stat-stable">—</span>
+        </div>
+      </aside>
+    </div>
+
+    <div class="pattern-library">
+      <span class="label">PATTERN LIBRARY · click to stamp at center</span>
+      <div class="pattern-grid" id="pattern-grid"></div>
+    </div>
+  </section>
+
+  <section id="rules" class="rules sticky-pair">
+    <div class="left">
+      <span class="label">02 / RULES</span>
+      <h2 class="headline-enter">Four laws.<br>Every cell, every generation.</h2>
+      <p class="headline-enter">The universe of Life is a two-state cellular automaton on an infinite square lattice. Each cell references its eight orthogonal and diagonal neighbors. Time advances in discrete ticks. At each tick, every cell is evaluated simultaneously against four rules — and the next frame replaces the last wholesale.</p>
+      <p class="headline-enter">From these four primitives, an entire taxonomy of behavior emerges: still lifes that never change, oscillators that pulse, spaceships that drift, and guns that emit gliders forever. Conway proved in 1982 that Life is Turing complete — sufficient to compute anything computable.</p>
+    </div>
+    <div class="right">
+      <div class="rule-card">
+        <div class="rule-num">01</div>
+        <div class="rule-body">
+          <h3>UNDERPOPULATION</h3>
+          <p>A live cell with fewer than two live neighbors dies. Isolation is fatal.</p>
+        </div>
+        <canvas class="rule-canvas" data-rule="underpop" width="140" height="140"></canvas>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">02</div>
+        <div class="rule-body">
+          <h3>SURVIVAL</h3>
+          <p>A live cell with two or three live neighbors survives. The neighborhood sustains it.</p>
+        </div>
+        <canvas class="rule-canvas" data-rule="survival" width="140" height="140"></canvas>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">03</div>
+        <div class="rule-body">
+          <h3>OVERPOPULATION</h3>
+          <p>A live cell with more than three live neighbors dies. Crowding is lethal.</p>
+        </div>
+        <canvas class="rule-canvas" data-rule="overpop" width="140" height="140"></canvas>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">04</div>
+        <div class="rule-body">
+          <h3>REPRODUCTION</h3>
+          <p>A dead cell with exactly three live neighbors becomes alive. The neighborhood seeds it.</p>
+        </div>
+        <canvas class="rule-canvas" data-rule="repro" width="140" height="140"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <section id="patterns" class="patterns">
+    <header class="section-head">
+      <span class="label">03 / TAXONOMY</span>
+      <h2 class="headline-enter">A taxonomy of behaviors<br>observed across half a century.</h2>
+    </header>
+    <div class="pattern-table">
+      <div class="pattern-row" data-cursor-hover>
+        <span class="pt-num">01</span>
+        <span class="pt-name">STILL LIFES</span>
+        <span class="pt-desc">Patterns that never change. The block, the beehive, the loaf — stable equilibria that persist indefinitely.</span>
+        <span class="pt-meta">P1</span>
+      </div>
+      <div class="pattern-row" data-cursor-hover>
+        <span class="pt-num">02</span>
+        <span class="pt-name">OSCILLATORS</span>
+        <span class="pt-desc">Return to their initial state after a fixed period. The blinker, the toad, the pulsar — rhythmic and predictable.</span>
+        <span class="pt-meta">P2–P15</span>
+      </div>
+      <div class="pattern-row" data-cursor-hover>
+        <span class="pt-num">03</span>
+        <span class="pt-name">SPACESHIPS</span>
+        <span class="pt-desc">Translate across the grid while cycling shape. The glider, the LWSS, the Gemini — motion from stillness.</span>
+        <span class="pt-meta">C/4 · C/2 · C/12</span>
+      </div>
+      <div class="pattern-row" data-cursor-hover>
+        <span class="pt-num">04</span>
+        <span class="pt-name">GUNS</span>
+        <span class="pt-desc">Emit a stream of spaceships forever. The Gosper glider gun was the first known — and proved infinite growth.</span>
+        <span class="pt-meta">P30 · GLIDER</span>
+      </div>
+      <div class="pattern-row" data-cursor-hover>
+        <span class="pt-num">05</span>
+        <span class="pt-name">METHUSELAHS</span>
+        <span class="pt-desc">Take many generations to stabilize. The R-pentomino runs for 1103 generations before settling into 116 cells.</span>
+        <span class="pt-meta">G&gt;1000</span>
+      </div>
+      <div class="pattern-row" data-cursor-hover>
+        <span class="pt-num">06</span>
+        <span class="pt-name">REPLICATORS</span>
+        <span class="pt-desc">Produce copies of themselves. The smallest known fits in a 12×11 bounding box and replicates every 8 generations.</span>
+        <span class="pt-meta">P8 · L>4</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="about">
+    <div class="about-grid">
+      <div>
+        <span class="label">04 / PROVENANCE</span>
+        <h2 class="headline-enter">John Horton Conway,<br>1970.</h2>
+      </div>
+      <div>
+        <p class="headline-enter">Late one evening in the autumn of 1970, the Cambridge mathematician John Horton Conway finished a pencil-and-paper experiment on a Go board. He had been searching for the simplest ruleset capable of producing unpredictable, lifelike behavior. The result — published in Martin Gardner's October 1970 Scientific American column — became the most famous cellular automaton in history.</p>
+        <p class="headline-enter">Conway died in April 2020 of COVID-19. His game outlives him on every desktop, every microcontroller, every browser tab — still surprising, still Turing-complete, still exactly four rules.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="foot-row">
+      <span>CELLULAR/LAB</span>
+      <span>BUILT WITH CANVAS 2D · NO FRAMEWORKS</span>
+      <span>© <span id="year"></span></span>
+    </div>
+    <div class="foot-rule"></div>
+    <div class="foot-row muted">
+      <span>RULES S04E01 · CONWAY 1970</span>
+      <span>STATUS: NOMINAL</span>
+      <span>END OF TRANSMISSION</span>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

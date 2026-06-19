@@ -1,0 +1,12 @@
+{
+  "name": "conways-game-of-life",
+  "version": "1.0.0",
+  "description": "A zero-player game. Four rules. Infinite emergence.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": { "node": ">=14" },
+  "license": "MIT"
+}
