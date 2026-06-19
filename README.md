@@ -1,2 +1,2 @@
 # conway
-conway-iota.vercel.app
+[Visit Conway](https://conway-iota.vercel.app)
